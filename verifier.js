@@ -31,10 +31,10 @@ var presentationConfig = {
     "url": "https://YOURPUBLICREACHABLEHOSTNAME/api/verifier/presentationCallback",
     "state": "STATEWILLBESETINCODE",
     "headers": {
-      "api-key": "OPTIONAL API-KEY for VERIFIER CALLBACK API"
+      "api-key": mainApp.config["apiKey"]
     }
   },
-  "authority": "did:web: THIS IS YOUR DID FROM THE VC PAGE IN AZURE PORTAL WHICH IS SET IN THE SAMPLE BY COPYING THE VALUE FROM CONFIG.JSON   ",
+  "authority": mainApp.config["VerifierAuthority"],
   "registration": {
     "clientName": "VerifiedEmployee Verifier",
     "purpose": "So we can see that you a veriable credentials expert"
@@ -42,7 +42,7 @@ var presentationConfig = {
   "includeReceipt": true,
   "requestedCredentials": [
     {
-      "type": "VerifiedEmployee"
+      "type": mainApp.config["CredentialType"]
     }
   ],
   "configuration": {
@@ -52,14 +52,6 @@ var presentationConfig = {
     }
   }
 };
-presentationConfig.registration.clientName = "Node.js Verified ID sample";
-// copy the issuerDID from the settings and fill in the acceptedIssuers part of the payload
-// this means only that issuer should be trusted for the requested credentialtype
-// this value is an array in the payload, you can trust multiple issuers for the same credentialtype
-// very common to accept the test VCs and the Production VCs coming from different verifiable credential services
-if ( presentationConfig.callback.headers ) {
-  presentationConfig.callback.headers['api-key'] = mainApp.config["apiKey"];
-}
 
 function requestTrace( req ) {
   var dateFormatted = new Date().toISOString().replace("T", " ");
@@ -100,12 +92,7 @@ mainApp.app.get('/api/verifier/presentation-request', async (req, res) => {
       return; 
   }
   console.log( `accessToken: ${accessToken}` );
-  // modify the callback method to make it easier to debug 
-  // with tools like ngrok since the URI changes all the time
-  // this way you don't need to modify the callback URL in the payload every time
-  // ngrok changes the URI
-  presentationConfig.requestedCredentials[0].type = mainApp.config["CredentialType"];
-  presentationConfig.authority = mainApp.config["VerifierAuthority"]
+
   presentationConfig.callback.url = `https://${req.hostname}/api/verifier/presentation-request-callback`;
   presentationConfig.callback.state = id;
 

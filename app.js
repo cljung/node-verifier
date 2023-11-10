@@ -27,11 +27,11 @@ var config = {
   "azClientId":  process.env.azClientId,
   "azClientSecret": process.env.azClientSecret,
   "VerifierAuthority": process.env.VerifierAuthority,
-  "CredentialType": process.env.CredentialType
+  "CredentialType": process.env.CredentialType,
+  "apiKey": uuid.v4()
 }
 module.exports.config = config;
 
-config.apiKey = uuid.v4();
 ///////////////////////////////////////////////////////////////////////////////////////
 // MSAL
 var msalConfig = {

@@ -210,40 +210,6 @@ mainApp.app.get('/api/verifier/presentation-response', async (req, res) => {
   })
 })
 
-/**
- * B2C REST API Endpoint for retrieving the VC presentation response
- * body: The InputClaims from the B2C policy. It will only be one claim named 'id'
- * return: a JSON structure with claims from the VC presented
- */
-var parserJson = bodyParser.json();
-mainApp.app.post('/api/verifier/presentation-response-b2c', parserJson, async (req, res) => {
-  var id = req.body.id;
-  requestTrace( req );
-  mainApp.sessionStore.get( id, (error, store) => {
-    if (store && store.sessionData && store.sessionData.status == "presentation_verified" ) {
-      console.log("Has VC. Will return it to B2C");      
-      var claims = store.sessionData.presentationResponse.verifiedCredentialsData[0].claims;
-      var claimsExtra = {
-        'vcType': presentationConfig.presentation.requestedCredentials[0].type,
-        'vcIss': store.sessionData.presentationResponse.verifiedCredentialsData[0].authority,
-        'vcSub': store.sessionData.presentationResponse.subject,
-        'vcKey': store.sessionData.presentationResponse.subject.replace("did:ion:", "did.ion.").split(":")[0]
-        };        
-        var responseBody = { ...claimsExtra, ...claims }; // merge the two structures
-        req.session.sessionData = null; 
-        console.log( responseBody );
-        res.status(200).json( responseBody );   
-    } else {
-      console.log('Will return 409 to B2C');
-      res.status(409).json({
-        'version': '1.0.0', 
-        'status': 400,
-        'userMessage': 'Verifiable Credentials not presented'
-        });   
-    }
-  })
-})
-
 mainApp.app.get('/api/verifier/get-presentation-details', async (req, res) => {
   var id = req.query.id;
   requestTrace( req );

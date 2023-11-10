@@ -43,7 +43,7 @@
             "metadata": {
                 "description": "Github repo URL"
             },
-            "defaultValue": "https://github.com/rogulati/Verifier.git"
+            "defaultValue": "https://github.com/cljung/node-verifier.git"
         },
         "branch": {
             "type": "string",

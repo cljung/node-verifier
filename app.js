@@ -26,39 +26,12 @@ var config = {
   "azTenantId": process.env.azTenantId,
   "azClientId":  process.env.azClientId,
   "azClientSecret": process.env.azClientSecret,
-  "VerifierAuthority": process.env.VerifierAuthority
+  "VerifierAuthority": process.env.VerifierAuthority,
+  "CredentialType": process.env.CredentialType
 }
 module.exports.config = config;
 
 config.apiKey = uuid.v4();
-///////////////////////////////////////////////////////////////////////////////////////
-// Check that the manifestURL have the matching tenantId with the config file
-/* === not needed for a verifier ===
-var manifestUrl = config.CredentialManifest.split("/")[5];
-if ( config.azTenantId != manifestUrl ) {
-  throw new Error( `TenantId in ManifestURL ${manifestUrl}. does not match tenantId in config file ${config.azTenantId}` );
-}
-
-// Check that the issuer in the config file match the manifest
-fetch( config.CredentialManifest, { method: 'GET'} )
-  .then(res => res.json())
-  .then((resp) => {
-    if ( !resp.token ) {
-      throw new Error( `Could not retrieve manifest from URL ${config.CredentialManifest}` );
-    }
-    config.manifest = JSON.parse(base64url.decode(resp.token.split(".")[1]));
-    // if you don't specify IssuerAuthority or VerifierAuthority in the config file, use the issuer DID from the manifest
-    if ( config.IssuerAuthority == "" ) {
-      config.IssuerAuthority = config.manifest.iss;
-    }
-    if ( config.VerifierAuthority == "" ) {
-      config.VerifierAuthority = config.manifest.iss;
-    }
-    if ( config.manifest.iss != config.IssuerAuthority ) {
-      throw new Error( `Wrong IssuerAuthority in config file ${config.IssuerAuthority}. Issuer in manifest is ${config.manifest.iss}` );
-    }
-  }); 
-*/
 ///////////////////////////////////////////////////////////////////////////////////////
 // MSAL
 var msalConfig = {
@@ -77,23 +50,6 @@ var msalConfig = {
       }
   }
 };
-
-// if certificateName is specified in config, then we change the MSAL config to use it
-/*if ( config.azCertificateName !== '') {
-  const privateKeyData = fs.readFileSync(config.azCertificatePrivateKeyLocation, 'utf8');
-  console.log(config.azCertThumbprint);  
-  const privateKeyObject = crypto.createPrivateKey({ key: privateKeyData, format: 'pem',    
-    passphrase: config.azCertificateName.replace("CN=", "") // the passphrase is the appShortName (see Configure.ps1)    
-  });
-  msalConfig.auth = {
-    clientId: config.azClientId,
-    authority: `https://login.microsoftonline.com/${config.azTenantId}`,
-    clientCertificate: {
-      thumbprint: config.azCertThumbprint,
-      privateKey: privateKeyObject.export({ format: 'pem', type: 'pkcs8' })
-    }
-  };
-}*/
 
 const cca = new msal.ConfidentialClientApplication(msalConfig);
 const msalClientCredentialRequest = {

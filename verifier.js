@@ -25,8 +25,33 @@ var parser = bodyParser.urlencoded({ extended: false });
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Setup the presentation request payload template
-var requestConfigFile = process.env.PRESENTATIONFILE || './presentation_request_config.json';
-var presentationConfig = require( requestConfigFile );
+var presentationConfig = {
+  "includeQRCode": false,
+  "callback": {
+    "url": "https://YOURPUBLICREACHABLEHOSTNAME/api/verifier/presentationCallback",
+    "state": "STATEWILLBESETINCODE",
+    "headers": {
+      "api-key": "OPTIONAL API-KEY for VERIFIER CALLBACK API"
+    }
+  },
+  "authority": "did:web: THIS IS YOUR DID FROM THE VC PAGE IN AZURE PORTAL WHICH IS SET IN THE SAMPLE BY COPYING THE VALUE FROM CONFIG.JSON   ",
+  "registration": {
+    "clientName": "VerifiedEmployee Verifier",
+    "purpose": "So we can see that you a veriable credentials expert"
+  },
+  "includeReceipt": true,
+  "requestedCredentials": [
+    {
+      "type": "VerifiedEmployee"
+    }
+  ],
+  "configuration": {
+    "validation": {
+      "allowRevoked": true,
+      "validateLinkedDomain": true
+    }
+  }
+};
 presentationConfig.registration.clientName = "Node.js Verified ID sample";
 // copy the issuerDID from the settings and fill in the acceptedIssuers part of the payload
 // this means only that issuer should be trusted for the requested credentialtype
@@ -79,8 +104,8 @@ mainApp.app.get('/api/verifier/presentation-request', async (req, res) => {
   // with tools like ngrok since the URI changes all the time
   // this way you don't need to modify the callback URL in the payload every time
   // ngrok changes the URI
-  //presentationConfig.authority = mainApp.config["VerifierAuthority"]
-  presentationConfig.authority = process.env.VerifierAuthority || mainApp.config["VerifierAuthority"]
+  presentationConfig.requestedCredentials[0].type = mainApp.config["CredentialType"];
+  presentationConfig.authority = mainApp.config["VerifierAuthority"]
   presentationConfig.callback.url = `https://${req.hostname}/api/verifier/presentation-request-callback`;
   presentationConfig.callback.state = id;
 

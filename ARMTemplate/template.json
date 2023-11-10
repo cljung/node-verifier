@@ -38,6 +38,13 @@
             },
             "defaultValue": "<VerifierAuthority>"
         },
+        "CredentialType": {
+            "type": "string",
+            "metadata": {
+                "description": "CredentialType"
+            },
+            "defaultValue": "VerifiedEmployee"
+        },
         "repoURL": {
             "type": "string",
             "metadata": {
@@ -140,7 +147,11 @@
                         {
                             "name": "VerifierAuthority",
                             "value": "[parameters('VerifierAuthority')]"
-                        }
+                        },
+                        {
+                            "name": "CredentialType",
+                            "value": "[parameters('CredentialType')]"
+                        }                        
                     ]
                 },
                 "scmSiteAlsoStopped": false,

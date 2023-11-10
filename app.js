@@ -22,13 +22,11 @@ var uuid = require('uuid');
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // config file can come from command line, env var or the default
-var configFile = process.argv.slice(2)[0];
-if ( !configFile ) {
-  configFile = process.env.CONFIGFILE || './config.json';
-}
-const config = require( configFile )
-if (!config.azTenantId) {
-  throw new Error('The config.json file is missing.')
+var config = {
+  "azTenantId": process.env.azTenantId,
+  "azClientId":  process.env.azClientId,
+  "azClientSecret": process.env.azClientSecret,
+  "VerifierAuthority": process.env.VerifierAuthority
 }
 module.exports.config = config;
 
@@ -124,18 +122,6 @@ cca.acquireTokenByClientCredential(msalClientCredentialRequest).then((result) =>
     throw new Error( `Could not acquire access token. Check your configuration for tenant ${config.azTenantId} and clientId ${config.azClientId}` );
   });
 
- ///////////////////////////////////////////////////////////////////////////////////////
-// Check if it is an EU tenant and set up the endpoint for it
-fetch( `https://login.microsoftonline.com/${config.azTenantId}/v2.0/.well-known/openid-configuration`, { method: 'GET'} )
-.then(res => res.json())
-.then((resp) => {
-  console.log( `tenant_region_scope = ${resp.tenant_region_scope}`);
-  config.tenant_region_scope = resp.tenant_region_scope;
-  // Check that the Credential Manifest URL is in the same tenant Region and throw an error if it's not
-  if ( !config.CredentialManifest.startsWith(config.msIdentityHostName) ) {
-    throw new Error( `Error in config file. CredentialManifest URL configured for wrong tenant region. Should start with: ${config.msIdentityHostName}` );
-  }
-}); 
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Main Express server function

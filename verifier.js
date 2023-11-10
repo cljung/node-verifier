@@ -25,10 +25,7 @@ var parser = bodyParser.urlencoded({ extended: false });
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Setup the presentation request payload template
-var requestConfigFile = process.argv.slice(2)[2];
-if ( !requestConfigFile ) {
-  requestConfigFile = process.env.PRESENTATIONFILE || './presentation_request_config.json';
-}
+var requestConfigFile = process.env.PRESENTATIONFILE || './presentation_request_config.json';
 var presentationConfig = require( requestConfigFile );
 presentationConfig.registration.clientName = "Node.js Verified ID sample";
 // copy the issuerDID from the settings and fill in the acceptedIssuers part of the payload
